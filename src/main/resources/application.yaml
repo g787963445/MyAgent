@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: MyAgent
+  ai:
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY:sk-20eda4455dfa439e8df532ad3e9b3fc6}
+      base-url: https://api.deepseek.com
+      chat:
+        options:
+          model: deepseek-chat
+          temperature: 0.2
+          max-tokens: 2048
+
+server:
+  port: 8080
+
+agent:
+  # 本地项目访问范围。前端目录选择器只能浏览和选择这个目录下的项目。
+  workspace-root: D:/mycode
+  context:
+    max-files: 8
+    max-file-chars: 6000
+    max-tree-lines: 120
