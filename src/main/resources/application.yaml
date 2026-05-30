@@ -3,7 +3,7 @@ spring:
     name: MyAgent
   ai:
     deepseek:
-      api-key: ${DEEPSEEK_API_KEY:sk-20eda4455dfa439e8df532ad3e9b3fc6}
+      api-key: ${DEEPSEEK_API_KEY:}
       base-url: https://api.deepseek.com
       chat:
         options:
