@@ -14,6 +14,11 @@ public class AgentChatRequest {
 
     private String projectPath;
 
+    /**
+     * chat: 普通问答；plan: 输出结构化修改方案。
+     */
+    private String mode = "chat";
+
     @NotBlank(message = "question 不能为空")
     private String question;
 
@@ -31,6 +36,14 @@ public class AgentChatRequest {
 
     public void setProjectPath(String projectPath) {
         this.projectPath = projectPath;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 
     public String getQuestion() {

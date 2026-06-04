@@ -15,10 +15,13 @@ public class ProjectContext {
 
     private List<SourceFileContext> files = new ArrayList<SourceFileContext>();
 
-    public ProjectContext(Path projectRoot, String fileTree, List<SourceFileContext> files) {
+    private int totalFileCount;
+
+    public ProjectContext(Path projectRoot, String fileTree, List<SourceFileContext> files, int totalFileCount) {
         this.projectRoot = projectRoot;
         this.fileTree = fileTree;
         this.files = files;
+        this.totalFileCount = totalFileCount;
     }
 
     public Path getProjectRoot() {
@@ -31,5 +34,17 @@ public class ProjectContext {
 
     public List<SourceFileContext> getFiles() {
         return files;
+    }
+
+    public int getTotalFileCount() {
+        return totalFileCount;
+    }
+
+    public int getIncludedFileCount() {
+        return files.size();
+    }
+
+    public int getOmittedFileCount() {
+        return Math.max(0, totalFileCount - files.size());
     }
 }

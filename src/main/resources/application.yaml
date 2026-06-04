@@ -18,6 +18,22 @@ agent:
   # 本地项目访问范围。前端目录选择器只能浏览和选择这个目录下的项目。
   workspace-root: D:/mycode
   context:
-    max-files: 8
-    max-file-chars: 6000
-    max-tree-lines: 120
+    max-files: 80
+    max-file-chars: 12000
+    max-tree-lines: 1000
+    max-total-chars: 200000
+    max-file-bytes: 262144
+    index-cache-seconds: 30
+  security:
+    mask-secrets: false
+    excluded-file-patterns:
+      - "*.pem"
+      - "*.key"
+      - "*.p12"
+      - "*.jks"
+      - "*.keystore"
+      - "id_rsa"
+      - "id_ed25519"
+  history:
+    enabled: true
+    file: data/chat-history.jsonl

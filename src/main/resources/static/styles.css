@@ -152,6 +152,64 @@ textarea:focus {
     font-size: 12px;
 }
 
+.mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.mode-button {
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--muted);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.mode-button.active {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #ffffff;
+}
+
+.file-results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 180px;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    list-style: none;
+}
+
+.file-results .muted {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.file-result-button {
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--blue);
+    cursor: pointer;
+    font-family: Consolas, monospace;
+    font-size: 12px;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+.file-result-button:hover {
+    border-color: var(--accent);
+    background: #f7fbf9;
+}
+
 .files-panel {
     min-height: 0;
 }
@@ -179,9 +237,54 @@ textarea:focus {
     font-size: 12px;
 }
 
+.used-files .file-reference {
+    display: grid;
+    gap: 4px;
+    color: var(--text);
+    font-family: inherit;
+}
+
+.file-reference span {
+    color: var(--blue);
+    font-family: Consolas, monospace;
+    font-weight: 700;
+}
+
+.file-reference small {
+    color: var(--accent-strong);
+    font-size: 11px;
+}
+
+.file-reference em {
+    color: var(--muted);
+    font-size: 11px;
+    font-style: normal;
+    line-height: 1.35;
+}
+
 .used-files .muted {
     color: var(--muted);
     font-family: inherit;
+}
+
+.safety-note {
+    display: grid;
+    gap: 6px;
+    padding: 11px 12px;
+    border: 1px solid #d8e8e2;
+    border-radius: 8px;
+    background: #f0f8f5;
+}
+
+.safety-note strong {
+    color: var(--accent-strong);
+    font-size: 13px;
+}
+
+.safety-note span {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.45;
 }
 
 .secondary-button,
@@ -385,6 +488,10 @@ textarea:focus {
     overflow: hidden;
 }
 
+.file-dialog {
+    width: min(920px, 100%);
+}
+
 .dialog-header {
     display: flex;
     align-items: center;
@@ -490,6 +597,19 @@ textarea:focus {
 
 .directory-empty {
     color: var(--muted);
+}
+
+.file-content {
+    min-height: 0;
+    margin: 0;
+    padding: 18px 20px;
+    overflow: auto;
+    background: #111816;
+    color: #edf4f1;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    white-space: pre;
 }
 
 @media (max-width: 860px) {

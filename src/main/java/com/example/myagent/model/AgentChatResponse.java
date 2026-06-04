@@ -16,6 +16,8 @@ public class AgentChatResponse {
 
     private List<String> usedFiles = new ArrayList<String>();
 
+    private List<SourceFileReference> contextFiles = new ArrayList<SourceFileReference>();
+
     private String projectRoot;
 
     public String getSessionId() {
@@ -40,6 +42,14 @@ public class AgentChatResponse {
 
     public void setUsedFiles(List<String> usedFiles) {
         this.usedFiles = usedFiles;
+    }
+
+    public List<SourceFileReference> getContextFiles() {
+        return contextFiles;
+    }
+
+    public void setContextFiles(List<SourceFileReference> contextFiles) {
+        this.contextFiles = contextFiles;
     }
 
     public String getProjectRoot() {

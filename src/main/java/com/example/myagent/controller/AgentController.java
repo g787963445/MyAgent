@@ -3,6 +3,8 @@ package com.example.myagent.controller;
 import com.example.myagent.model.AgentChatRequest;
 import com.example.myagent.model.AgentChatResponse;
 import com.example.myagent.model.DirectoryListResponse;
+import com.example.myagent.model.FileContentResponse;
+import com.example.myagent.model.FileSearchResponse;
 import com.example.myagent.model.WorkspaceResponse;
 import com.example.myagent.service.AgentService;
 import com.example.myagent.service.WorkspaceService;
@@ -47,6 +49,18 @@ public class AgentController {
     @GetMapping("/directories")
     public DirectoryListResponse directories(@RequestParam(value = "path", required = false) String path) {
         return workspaceService.listDirectories(path);
+    }
+
+    @GetMapping("/files")
+    public FileSearchResponse files(@RequestParam("projectPath") String projectPath,
+                                    @RequestParam(value = "query", required = false) String query) {
+        return workspaceService.searchFiles(projectPath, query);
+    }
+
+    @GetMapping("/file")
+    public FileContentResponse file(@RequestParam("projectPath") String projectPath,
+                                    @RequestParam("relativePath") String relativePath) {
+        return workspaceService.readFile(projectPath, relativePath);
     }
 
     @PostMapping("/chat")

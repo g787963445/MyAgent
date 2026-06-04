@@ -1,15 +1,13 @@
 package com.example.myagent.model;
 
 /**
- * 被检索出来的源码片段。
+ * 返回给前端的引用文件摘要。
  *
- * <p>第一版按文件维度截取内容；后续可以升级为按类、方法或 AST 节点切分。</p>
+ * <p>不包含文件正文，只展示本次回答为什么参考了这个文件。</p>
  */
-public class SourceFileContext {
+public class SourceFileReference {
 
     private String relativePath;
-
-    private String content;
 
     private int score;
 
@@ -21,10 +19,8 @@ public class SourceFileContext {
 
     private boolean truncated;
 
-    public SourceFileContext(String relativePath, String content, int score, String reason,
-                             long fileSize, long lastModified, boolean truncated) {
+    public SourceFileReference(String relativePath, int score, String reason, long fileSize, long lastModified, boolean truncated) {
         this.relativePath = relativePath;
-        this.content = content;
         this.score = score;
         this.reason = reason;
         this.fileSize = fileSize;
@@ -34,10 +30,6 @@ public class SourceFileContext {
 
     public String getRelativePath() {
         return relativePath;
-    }
-
-    public String getContent() {
-        return content;
     }
 
     public int getScore() {

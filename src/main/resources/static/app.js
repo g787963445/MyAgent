@@ -8,6 +8,10 @@ const form = document.getElementById("chatForm");
 const question = document.getElementById("question");
 const projectPath = document.getElementById("projectPath");
 const chooseProjectButton = document.getElementById("chooseProjectButton");
+const chatModeButton = document.getElementById("chatModeButton");
+const planModeButton = document.getElementById("planModeButton");
+const fileSearch = document.getElementById("fileSearch");
+const fileResults = document.getElementById("fileResults");
 const sessionId = document.getElementById("sessionId");
 const statusText = document.getElementById("statusText");
 const sendButton = document.getElementById("sendButton");
@@ -20,9 +24,15 @@ const currentFolder = document.getElementById("currentFolder");
 const parentButton = document.getElementById("parentButton");
 const selectCurrentButton = document.getElementById("selectCurrentButton");
 const directoryList = document.getElementById("directoryList");
+const fileDialog = document.getElementById("fileDialog");
+const closeFileDialogButton = document.getElementById("closeFileDialogButton");
+const fileDialogPath = document.getElementById("fileDialogPath");
+const fileContent = document.getElementById("fileContent");
 
 localStorage.setItem("myagent.sessionId", state.sessionId);
 sessionId.textContent = state.sessionId;
+state.mode = localStorage.getItem("myagent.mode") || "chat";
+setMode(state.mode);
 
 appendMessage("assistant", "你好，我已经准备好了。");
 initializeWorkspace();
@@ -48,6 +58,7 @@ form.addEventListener("submit", async (event) => {
             body: JSON.stringify({
                 sessionId: state.sessionId,
                 projectPath: state.projectPath,
+                mode: state.mode,
                 question: text
             })
         });
@@ -64,7 +75,7 @@ form.addEventListener("submit", async (event) => {
         localStorage.setItem("myagent.sessionId", state.sessionId);
         sessionId.textContent = state.sessionId;
         appendMessage("assistant", payload.answer || "");
-        renderUsedFiles(payload.usedFiles || []);
+        renderUsedFiles(payload.contextFiles || []);
     } catch (error) {
         pending.remove();
         appendMessage("error", error.message || "Network error");
@@ -93,11 +104,25 @@ chooseProjectButton.addEventListener("click", () => {
     openPathDialog(state.projectPath || state.workspaceRoot);
 });
 
+chatModeButton.addEventListener("click", () => setMode("chat"));
+planModeButton.addEventListener("click", () => setMode("plan"));
+
+fileSearch.addEventListener("input", debounce(() => {
+    searchFiles(fileSearch.value.trim());
+}, 250));
+
 closeDialogButton.addEventListener("click", closePathDialog);
+closeFileDialogButton.addEventListener("click", closeFileDialog);
 
 pathDialog.addEventListener("click", (event) => {
     if (event.target === pathDialog) {
         closePathDialog();
+    }
+});
+
+fileDialog.addEventListener("click", (event) => {
+    if (event.target === fileDialog) {
+        closeFileDialog();
     }
 });
 
@@ -133,6 +158,18 @@ function setProjectPath(path) {
     state.projectPath = path;
     localStorage.setItem("myagent.projectPath", path);
     projectPath.textContent = path;
+    fileSearch.value = "";
+    renderFileResults([]);
+}
+
+function setMode(mode) {
+    state.mode = mode === "plan" ? "plan" : "chat";
+    localStorage.setItem("myagent.mode", state.mode);
+    chatModeButton.classList.toggle("active", state.mode === "chat");
+    planModeButton.classList.toggle("active", state.mode === "plan");
+    question.placeholder = state.mode === "plan"
+        ? "Describe the change you want. Enter sends, Shift+Enter adds a new line."
+        : "Ask about this Java project. Enter sends, Shift+Enter adds a new line.";
 }
 
 async function openPathDialog(path) {
@@ -191,11 +228,84 @@ function renderDirectories(directories) {
     });
 }
 
+async function searchFiles(query) {
+    if (!state.projectPath) {
+        return;
+    }
+    if (!query) {
+        renderFileResults([]);
+        return;
+    }
+
+    fileResults.innerHTML = '<li class="muted">Searching...</li>';
+    try {
+        const url = `/api/agent/files?projectPath=${encodeURIComponent(state.projectPath)}&query=${encodeURIComponent(query)}`;
+        const response = await fetch(url);
+        const payload = await response.json();
+        if (!response.ok) {
+            throw new Error(payload.message || "Search failed");
+        }
+        renderFileResults(payload.files || []);
+    } catch (error) {
+        fileResults.innerHTML = "";
+        const item = document.createElement("li");
+        item.className = "muted";
+        item.textContent = error.message;
+        fileResults.appendChild(item);
+    }
+}
+
+function renderFileResults(files) {
+    fileResults.innerHTML = "";
+    if (!files.length) {
+        const item = document.createElement("li");
+        item.className = "muted";
+        item.textContent = fileSearch.value.trim() ? "No matching files" : "Type to search files";
+        fileResults.appendChild(item);
+        return;
+    }
+    files.forEach((file) => {
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "file-result-button";
+        button.textContent = file.relativePath;
+        button.addEventListener("click", () => openFile(file.relativePath));
+        item.appendChild(button);
+        fileResults.appendChild(item);
+    });
+}
+
+async function openFile(relativePath) {
+    fileDialog.classList.remove("hidden");
+    fileDialogPath.textContent = relativePath;
+    fileContent.textContent = "Loading...";
+    try {
+        const url = `/api/agent/file?projectPath=${encodeURIComponent(state.projectPath)}&relativePath=${encodeURIComponent(relativePath)}`;
+        const response = await fetch(url);
+        const payload = await response.json();
+        if (!response.ok) {
+            throw new Error(payload.message || "Cannot read file");
+        }
+        fileDialogPath.textContent = `${payload.relativePath}${payload.truncated ? " · truncated" : ""}`;
+        fileContent.textContent = payload.content || "";
+    } catch (error) {
+        fileContent.textContent = error.message;
+    }
+}
+
+function closeFileDialog() {
+    fileDialog.classList.add("hidden");
+}
+
 function setBusy(value) {
     state.busy = value;
     sendButton.disabled = value;
     clearButton.disabled = value;
     chooseProjectButton.disabled = value;
+    chatModeButton.disabled = value;
+    planModeButton.disabled = value;
+    fileSearch.disabled = value;
     question.disabled = value;
     statusText.textContent = value ? "Working" : "Ready";
 }
@@ -220,7 +330,12 @@ function renderUsedFiles(files) {
     }
     files.forEach((file) => {
         const item = document.createElement("li");
-        item.textContent = file;
+        item.className = "file-reference";
+        item.innerHTML = `
+            <span>${escapeHtml(file.relativePath || file)}</span>
+            <small>score ${escapeHtml(String(file.score || 0))}${file.truncated ? " · truncated" : ""}</small>
+            <em>${escapeHtml(file.reason || "selected context")}</em>
+        `;
         usedFiles.appendChild(item);
     });
 }
@@ -337,4 +452,12 @@ function escapeHtml(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+function debounce(callback, waitMs) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => callback(...args), waitMs);
+    };
 }

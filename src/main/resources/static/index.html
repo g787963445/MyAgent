@@ -13,44 +13,65 @@
             <div class="brand-mark">MA</div>
             <div>
                 <h1>MyAgent</h1>
-                <p>Java Project Assistant</p>
+                <p>Java 项目编程助手</p>
             </div>
         </div>
 
         <section class="panel">
-            <label>Project</label>
-            <div id="projectPath" class="selected-path">Loading workspace...</div>
-            <button id="chooseProjectButton" class="secondary-button" type="button" title="Choose project folder">Choose</button>
+            <label>项目路径</label>
+            <div id="projectPath" class="selected-path">正在加载工作区...</div>
+            <button id="chooseProjectButton" class="secondary-button" type="button" title="选择项目目录">选择项目</button>
         </section>
 
         <section class="panel">
-            <label>Session</label>
+            <label>对话模式</label>
+            <div class="mode-toggle">
+                <button id="chatModeButton" class="mode-button active" type="button">普通问答</button>
+                <button id="planModeButton" class="mode-button" type="button">修改方案</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <label for="fileSearch">搜索文件</label>
+            <input id="fileSearch" type="text" placeholder="Controller、service、yaml...">
+            <ul id="fileResults" class="file-results">
+                <li class="muted">输入关键字搜索文件</li>
+            </ul>
+        </section>
+
+        <section class="panel">
+            <label>会话编号</label>
             <div id="sessionId" class="session-id"></div>
         </section>
 
         <section class="panel files-panel">
-            <div class="panel-title">Used Files</div>
+            <div class="panel-title">本次引用文件</div>
             <ul id="usedFiles" class="used-files">
-                <li class="muted">No files yet</li>
+                <li class="muted">暂无引用文件</li>
             </ul>
         </section>
 
-        <button id="clearButton" class="secondary-button" type="button" title="Clear conversation">Clear</button>
+        <section class="safety-note">
+            <strong>私人助手模式</strong>
+            <span>选中的项目文件、环境变量和配置文件可能会发送给 DeepSeek。证书和私钥文件默认跳过。</span>
+        </section>
+
+        <button id="clearButton" class="secondary-button" type="button" title="清空当前会话">清空会话</button>
     </aside>
 
     <section class="chat-area">
         <header class="chat-header">
             <div>
-                <h2>Code Chat</h2>
-                <p id="statusText">Ready</p>
+                <h2>代码助手对话</h2>
+                <p id="statusText">就绪</p>
             </div>
         </header>
 
         <div id="messages" class="messages" aria-live="polite"></div>
 
         <form id="chatForm" class="composer">
-            <textarea id="question" rows="3" placeholder="Ask about this Java project..." required></textarea>
-            <button id="sendButton" class="send-button" type="submit" title="Send">Send</button>
+            <textarea id="question" rows="3" placeholder="请输入你想问的 Java 项目问题..." required></textarea>
+            <button id="sendButton" class="send-button" type="submit" title="发送">发送</button>
         </form>
     </section>
 </main>
@@ -59,23 +80,36 @@
     <section class="dialog">
         <header class="dialog-header">
             <div>
-                <h2 id="pathDialogTitle">Choose Project</h2>
-                <p id="browserRoot">Workspace</p>
+                <h2 id="pathDialogTitle">选择项目目录</h2>
+                <p id="browserRoot">工作区</p>
             </div>
-            <button id="closeDialogButton" class="icon-button" type="button" title="Close">×</button>
+            <button id="closeDialogButton" class="icon-button" type="button" title="关闭">×</button>
         </header>
 
         <div class="current-folder">
-            <span>Current</span>
+            <span>当前目录</span>
             <strong id="currentFolder"></strong>
         </div>
 
         <div class="dialog-actions">
-            <button id="parentButton" class="secondary-button" type="button">Up</button>
-            <button id="selectCurrentButton" class="send-button" type="button">Use This Folder</button>
+            <button id="parentButton" class="secondary-button" type="button">上一级</button>
+            <button id="selectCurrentButton" class="send-button" type="button">使用当前目录</button>
         </div>
 
         <ul id="directoryList" class="directory-list"></ul>
+    </section>
+</div>
+
+<div id="fileDialog" class="dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="fileDialogTitle">
+    <section class="dialog file-dialog">
+        <header class="dialog-header">
+            <div>
+                <h2 id="fileDialogTitle">文件预览</h2>
+                <p id="fileDialogPath"></p>
+            </div>
+            <button id="closeFileDialogButton" class="icon-button" type="button" title="关闭">×</button>
+        </header>
+        <pre id="fileContent" class="file-content"></pre>
     </section>
 </div>
 
